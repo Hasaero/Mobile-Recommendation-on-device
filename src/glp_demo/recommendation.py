@@ -1,4 +1,4 @@
-"""추천 엔진 모듈: 다중 신호를 결합하여 개인화된 POI 추천을 생성하는 모듈
+﻿"""추천 엔진 모듈: 다중 신호를 결합하여 개인화된 POI 추천을 생성하는 모듈
 
 이 모듈은 다음 신호들을 종합하여 추천 점수를 계산합니다:
 - 루틴 신호: 시간대별 활동 패턴에 기반한 점수
@@ -20,7 +20,7 @@ from .pkg import PersonalKnowledgeGraph
 from .process_mining import infer_time_slot
 
 if TYPE_CHECKING:
-    from .llm import ZeroShotLLMScorer
+    from .openai_scorer import OpenAIZeroShotScorer
 
 # POI 카테고리를 사용자 활동으로 매핑하는 테이블
 # 루틴 모델에서 시간대별 활동 확률을 조회할 때 사용
@@ -87,7 +87,7 @@ class RecommendationEngine:
         routine_model,
         knowledge_graph: PersonalKnowledgeGraph,
         common_graph: CommonKnowledgeGraph,
-        zero_shot_scorer: ZeroShotLLMScorer | None = None,
+        zero_shot_scorer: OpenAIZeroShotScorer | None = None,
     ) -> None:
         """
         추천 엔진을 초기화하는 함수
@@ -393,5 +393,7 @@ class RecommendationEngine:
             recommendation.candidate.reasoning_tokens["llm"] = bonus
             # 최종 점수에 가중치를 적용하여 LLM 점수 반영
             recommendation.candidate.score += ZERO_SHOT_LLM_WEIGHT * bonus
+
+
 
 
