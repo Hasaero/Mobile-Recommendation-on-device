@@ -8,8 +8,8 @@ This repository contains a lightweight Python demo that showcases how routine mi
 - **Personal Knowledge Graph**: compacts user-specific preferences, visit recency, and app usage counts.
 - **Common Knowledge Graph**: stores open-vs-closed POI metadata and allows proximity queries.
 - **App Category Signals**: infers short-term intent from recent app categories.
-- **Zero-shot LLM Scoring**: queries an open-source text generation model to boost unseen POIs; falls back only if the generator errors.
-- ****LLM Explanations**: queries an open-source text model to produce one-sentence English summaries that cite the top reasons (falls back to templates if transformers is unavailable).
+- **OpenAI-based Zero-shot Scoring**: uses OpenAI GPT API to score unseen POIs based on user context and POI features.
+- **Template-based Explanations**: generates natural-language recommendation explanations using simple templates based on reasoning tokens.
 
 ## Project Layout
 
@@ -35,30 +35,36 @@ python -m glp_demo.demo
 ```
 
 The script prints the planner tool order, scored recommendation candidates, and natural-language explanations.
-> Note: Install `transformers` and `accelerate`, and download an open-source chat model (e.g. TinyLlama-1.1B-Chat) before running the demo to enable LLM-based scoring and explanations.
+> Note: Set `OPENAI_API_KEY` environment variable to enable OpenAI-based zero-shot scoring. Install the `openai` package with `pip install openai`.
 
 ## Next Steps
 
 - Replace the synthetic logs with device data ingestion APIs.
-- Tune the explanation prompt or plug in your preferred instruction-tuned LLM.
+- Tune the OpenAI scoring prompt or switch to a different model.
 - Expand the knowledge graphs with richer schemas and persistence.
 - Integrate lightweight bandit logic to balance exploration versus exploitation.
 
-### Zero-shot scoring hook
+### OpenAI Zero-shot Scoring
 
-```
-from glp_demo.llm import ZeroShotLLMScorer
+```python
+from glp_demo.llm import OpenAIZeroShotScorer
 from glp_demo.recommendation import RecommendationEngine
+
+# Initialize with OpenAI API key
+scorer = OpenAIZeroShotScorer(
+    api_key="your-api-key",  # or set OPENAI_API_KEY env var
+    model="gpt-4",
+    temperature=0.3,
+)
 
 engine = RecommendationEngine(
     routine_model,
     personal_graph,
     common_graph,
-    zero_shot_scorer=ZeroShotLLMScorer(),
+    zero_shot_scorer=scorer,
 )
 ```
 
-The stub returns zeros by default so behaviour stays identical until you replace the scorer with a real LLM client.
-ExplanationGenerator will also attempt to use transformers for narrative output, but will gracefully fall back to templated messages if the dependency is missing.
+The scorer uses OpenAI GPT models to compute relevance scores for POI candidates based on user context. If the API call fails, it returns default scores (0.5) for all candidates.
 
 
