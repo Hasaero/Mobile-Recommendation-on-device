@@ -1,4 +1,5 @@
-﻿# Galaxy Life Planner Demo
+﻿# Mobile Rec system
+
 
 This repository contains a lightweight Python demo that showcases how routine mining, a personal knowledge graph, a common knowledge graph, app category signals, and an explanation layer cooperate to produce on-device recommendations.
 
